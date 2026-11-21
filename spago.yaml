@@ -1,0 +1,37 @@
+package:
+  name: arrays-indexed
+  description: Branded array indices that need no Maybe
+  dependencies:
+    - arrays: ">=7.3.0 <8.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - partial: ">=4.0.0 <5.0.0"
+    - prelude: ">=6.0.0 <7.0.0"
+    - st: ">=6.2.0 <7.0.0"
+    - tuples: ">=7.0.0 <8.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - aff
+      - arrays
+      - console
+      - datetime
+      - effect
+      - exceptions
+      - identity
+      - newtype
+      - now
+      - spec
+      - st
+      - tailrec
+      - transformers
+      - tuples
+  publish:
+    version: 0.1.0
+    license: MIT
+    location:
+      githubOwner: rowtype-yoga
+      githubRepo: purescript-arrays-indexed
+workspace:
+  packageSet:
+    registry: 73.2.0

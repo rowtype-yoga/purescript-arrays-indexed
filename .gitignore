@@ -1,0 +1,13 @@
+/bower_components/
+/node_modules/
+/output/
+/.psc-package/
+/.psc*
+/.purs*
+/.psa*
+/.spago/
+/.nyc_output/
+/coverage/
+/.idea/
+.spec-results
+.DS_Store
