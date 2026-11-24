@@ -63,8 +63,9 @@ withFixed array use = do
 -- | Runs `withFixed` on its own and keeps only the array.
 withArray :: forall a r. (forall s h. Fixed s h a -> ST h r) -> Array a -> Array a
 withArray use array = ST.run do
-  frozen /\ _ <- withFixed array use
-  pure frozen
+  stArray <- STArray.thaw array
+  _ <- withIndexed array \original -> use (Fixed original stArray)
+  STArray.unsafeFreeze stArray
 
 read :: forall s h a. Index s -> Fixed s h a -> ST h a
 read i (Fixed _ stArray) = unsafePartial (Partial.peek (Indexed.toInt i) stArray)
@@ -79,11 +80,11 @@ modify i f arr = do
 
 -- | Exchanges two elements.
 swap :: forall s h a. Index s -> Index s -> Fixed s h a -> ST h Unit
-swap i j arr = do
-  x <- read i arr
-  y <- read j arr
-  write i y arr
-  write j x arr
+swap i j (Fixed _ stArray) = unsafePartial do
+  x <- Partial.peek (Indexed.toInt i) stArray
+  y <- Partial.peek (Indexed.toInt j) stArray
+  Partial.poke (Indexed.toInt i) y stArray
+  Partial.poke (Indexed.toInt j) x stArray
 
 -- | Checks an `Int` once and hands back an index you can use from then on.
 index :: forall s h a. Int -> Fixed s h a -> Maybe (Index s)

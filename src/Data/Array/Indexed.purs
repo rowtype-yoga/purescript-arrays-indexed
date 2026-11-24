@@ -118,18 +118,26 @@ length :: forall s a. Indexed s a -> Int
 length (Indexed array) = Array.length array
 
 first :: forall s a. Indexed s a -> Maybe (Index s)
-first = index 0
+first xs
+  | length xs > 0 = Just (Index 0)
+  | otherwise = Nothing
 
 last :: forall s a. Indexed s a -> Maybe (Index s)
-last xs = index (length xs - 1) xs
+last xs
+  | length xs > 0 = Just (Index (length xs - 1))
+  | otherwise = Nothing
 
 -- | The position after this one, unless this is the last.
 next :: forall s a. Index s -> Indexed s a -> Maybe (Index s)
-next (Index i) xs = index (i + 1) xs
+next (Index i) xs
+  | i + 1 < length xs = Just (Index (i + 1))
+  | otherwise = Nothing
 
 -- | The position before this one, unless this is the first.
 prev :: forall s a. Index s -> Indexed s a -> Maybe (Index s)
-prev (Index i) xs = index (i - 1) xs
+prev (Index i) _
+  | i > 0 = Just (Index (i - 1))
+  | otherwise = Nothing
 
 -- | Zips two arrays of the same brand. They have the same length, so nothing
 -- | is dropped.
