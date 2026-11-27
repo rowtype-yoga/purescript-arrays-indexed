@@ -19,6 +19,7 @@ module Data.Array.ST.Indexed
   ( Fixed
   , withFixed
   , withArray
+  , replicateLike
   , read
   , write
   , modify
@@ -36,6 +37,7 @@ import Prelude
 
 import Control.Monad.ST (Region, ST)
 import Control.Monad.ST as ST
+import Data.Array as Array
 import Data.Array.Indexed (Index, Indexed, withIndexed)
 import Data.Array.Indexed as Indexed
 import Data.Array.ST (STArray)
@@ -50,6 +52,13 @@ data Fixed :: Type -> Region -> Type -> Type
 data Fixed s h a = Fixed (Indexed s a) (STArray h a)
 
 type role Fixed nominal nominal nominal
+
+-- | A new mutable array as long as this one and with its brand, every element `value`, so an
+-- | index into one is an index into the other: a table of distances next to a graph's edges.
+replicateLike :: forall s h a b. b -> Fixed s h a -> ST h (Fixed s h b)
+replicateLike value (Fixed original _) = do
+  stArray <- STArray.unsafeThaw (Array.replicate (Indexed.length original) value)
+  pure (Fixed (Indexed.zipWith (\_ _ -> value) original original) stArray)
 
 -- | Copies the array, lets you work on the copy, and hands it back with your
 -- | result. The brand can't leave the function you pass.

@@ -6,8 +6,9 @@ import Control.Monad.ST (ST)
 import Control.Monad.ST as ST
 import Control.Monad.ST.Ref as STRef
 import Data.Array.Indexed (Index, toInt)
-import Data.Array.ST.Indexed (Fixed, first, index, indices, last, length, modify, next, prev, read, swap, withArray, withFixed, write)
+import Data.Array.ST.Indexed (Fixed, first, index, indices, last, length, modify, next, prev, read, replicateLike, swap, withArray, withFixed, write)
 import Data.Foldable (for_)
+import Data.Traversable (for)
 import Data.Maybe (Maybe(..))
 import Data.Tuple.Nested ((/\))
 import Example.QuickSort (quickSort)
@@ -32,6 +33,15 @@ spec = describe "Data.Array.ST.Indexed" do
           STRef.modify (_ + x) total
         STRef.read total
         `shouldEqual` 6
+
+  describe "replicateLike" do
+    it "makes an array of the same length whose indices are the first's" do
+      ST.run (withFixed [ "a", "b", "c" ] \letters -> do
+        counts <- replicateLike 0 letters
+        for_ (indices letters) \i -> read i letters >>= \letter -> write i (if letter == "b" then 2 else 1) counts
+        for_ (last letters) \i -> modify i (_ + 10) counts
+        for (indices letters) \i -> read i counts)
+        `shouldEqual` ([ "a", "b", "c" ] /\ [ 1, 2, 11 ])
 
   describe "read and write" do
     it "write replaces the element read returns" do
